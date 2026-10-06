@@ -1,0 +1,613 @@
+{
+  "info": {
+    "_postman_id": "98710b30-0f05-46f4-9ec4-b1f9cd610deb",
+    "name": "Serverest",
+    "description": "**Descrição:**  \nColeção de testes para APIs REST usando Postman. O objetivo foi validar endpoints, autenticação, criação e consulta de recursos via métodos `GET`, `POST`, `PUT` e `DELETE`. Foram aplicados testes com variáveis de ambiente, scripts de pré-requisição e testes automáticos com asserções.\n\n**Tecnologias utilizadas:**\n\nPostman, JavaScript, JSON, REST API\n\n**Habilidades desenvolvidas:**\n\n- Criação de cenários completos de teste de API\n    \n- Validação de respostas HTTP, status codes e payloads\n    \n- Uso de testes automatizados no próprio Postman com JavaScript",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "42443849",
+    "_collection_link": "https://go.postman.co/collection/42443849-98710b30-0f05-46f4-9ec4-b1f9cd610deb?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Login",
+      "item": [
+        {
+          "name": "Realizar login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let responseJson = (pm.response.json())\r",
+                  "\r",
+                  "let tokenSplit = responseJson['authorization'].split(' ')\r",
+                  "\r",
+                  "pm.globals.set(\"acessToken\", tokenSplit[1]);"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n\"email\": \"armando@qa.com.br\",\r\n\"password\": \"Nimbus2000\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseURL}}/login",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Usuário",
+      "item": [
+        {
+          "name": "Buscar usuário por ID",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseURL}}/usuarios?_id=IS8eIb2BJKuHltsf",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "usuarios"
+              ],
+              "query": [
+                {
+                  "key": "_id",
+                  "value": "IS8eIb2BJKuHltsf"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar usuários cadastrados",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseURL}}/usuarios",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cadastrar usuário",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const randomNumber = Math.floor(Math.random() * 9000)\r",
+                  "const randomName = `User Number ${randomNumber}`\r",
+                  "const randomEmail = `name.${randomNumber}@qa.com`\r",
+                  "\r",
+                  "pm.globals.set('email', randomEmail)\r",
+                  "pm.globals.set('user', randomName)"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"nome\": \"{{nome}}\",\r\n  \"email\": \"{{email}}\",\r\n  \"password\": \"Nimbus2000\",\r\n  \"administrador\": \"true\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseURL}}/usuarios",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Editar usuário",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"nome\": \"Armando Ferrari de Godoy\",\r\n  \"email\": \"armando@qa.com.br\",\r\n  \"password\": \"NovaNimbus2000\",\r\n  \"administrador\": \"true\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseURL}}/usuarios/IS8eIb2BJKuHltsf",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "usuarios",
+                "IS8eIb2BJKuHltsf"
+              ],
+              "query": [
+                {
+                  "key": "_id",
+                  "value": "IS8eIb2BJKuHltsf",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Excluir usuário",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseURL}}/usuarios/DKZyu4hXoacxODbI",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "usuarios",
+                "DKZyu4hXoacxODbI"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Produtos",
+      "item": [
+        {
+          "name": "Cadastrar produtos",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const loginRequest = {\r",
+                  "    url: pm.environment.get('baseURL') + '/login',\r",
+                  "    method: 'POST',\r",
+                  "    body: {\r",
+                  "        mode: 'raw',\r",
+                  "        raw: JSON.stringify({\r",
+                  "            email: pm.globals.get('email'),\r",
+                  "            password: pm.globals.get('password')\r",
+                  "        }),\r",
+                  "        options: {\r",
+                  "            raw: {\r",
+                  "                language: 'json'\r",
+                  "            }\r",
+                  "        }\r",
+                  "    }\r",
+                  "}\r",
+                  "\r",
+                  "pm.sendRequest(loginRequest, function (err, response) {\r",
+                  "    let resJson = response.json()\r",
+                  "    let tokenSplit = resJson['authorization'].split(' ')\r",
+                  "    pm.environment.set('accessToken', tokenSplit[1])\r",
+                  "});\r",
+                  "\r",
+                  "pm.globals.set('randomProduct', `Product ${Math.random()}`)"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const responseJson = pm.response.json()\r",
+                  "\r",
+                  "pm.test(\"Status code is 201\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "if(pm.response.code == 201) {\r",
+                  "    pm.globals.set('newProductI', responseJson._id)\r",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{acessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"nome\": \"{{randomProduct}}\",\r\n  \"preco\": 1500,\r\n  \"descricao\": \"Video Game\",\r\n  \"quantidade\": 82\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseURL}}/produtos",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "produtos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar produtos cadastrados",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseURL}}/produtos",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "produtos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar produto por ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "})\r",
+                  "\r",
+                  "pm.test(\"Response time is less than 200ms\", function () {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseURL}}/produtos/{{newProductId}}",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "produtos",
+                "{{newProductId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Excluir produto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {\r",
+                  "    pm.response.to.have.status(400);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Your test name\", function () {\r",
+                  "    var jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData.value).to.eql(100);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{acessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseURL}}/produtos/{{newProductId}}",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "produtos",
+                "{{newProductId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Editar produto",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{acessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"nome\": \"Xbox360\",\r\n  \"preco\": 1100,\r\n  \"descricao\": \"Video Game\",\r\n  \"quantidade\": 82\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseURL}}/produtos/Yu5Z4r0hGbf7dxP9",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "produtos",
+                "Yu5Z4r0hGbf7dxP9"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Carrinho",
+      "item": [
+        {
+          "name": "Listar carrinhos cadastrado",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseURL}}/carrinhos",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "carrinhos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cadastrar carrinho",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{acessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"produtos\": [\r\n    {\r\n      \"idProduto\": \"Yu5Z4r0hGbf7dxP9\",\r\n      \"quantidade\": 15\r\n    },\r\n    {\r\n      \"idProduto\": \"ke55NelGmJRSHPeX\",\r\n      \"quantidade\": 32\r\n    }\r\n  ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseURL}}/carrinhos",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "carrinhos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar carrinho por ID",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseURL}}/carrinhos/148Cm53zvOAwUKmj",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "carrinhos",
+                "148Cm53zvOAwUKmj"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Excluir carrinho",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{acessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseURL}}/carrinhos/concluir-compra",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "carrinhos",
+                "concluir-compra"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Excluir carrinho e retornar produtos para estoque",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{acessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseURL}}/carrinhos/cancelar-compra",
+              "host": [
+                "{{baseURL}}"
+              ],
+              "path": [
+                "carrinhos",
+                "cancelar-compra"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
