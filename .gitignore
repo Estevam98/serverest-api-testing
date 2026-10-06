@@ -1,0 +1,27 @@
+# Node
+node_modules/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Postman
+*.postman_environment.json
+
+# Logs
+*.log
+
+# Test reports
+newman/
+reports/
+allure-results/
+allure-report/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
