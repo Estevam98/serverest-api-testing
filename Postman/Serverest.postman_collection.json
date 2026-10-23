@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "98710b30-0f05-46f4-9ec4-b1f9cd610deb",
     "name": "Serverest",
-    "description": "**Descrição:**  \nColeção de testes para APIs REST usando Postman. O objetivo foi validar endpoints, autenticação, criação e consulta de recursos via métodos `GET`, `POST`, `PUT` e `DELETE`. Foram aplicados testes com variáveis de ambiente, scripts de pré-requisição e testes automáticos com asserções.\n\n**Tecnologias utilizadas:**\n\nPostman, JavaScript, JSON, REST API\n\n**Habilidades desenvolvidas:**\n\n- Criação de cenários completos de teste de API\n    \n- Validação de respostas HTTP, status codes e payloads\n    \n- Uso de testes automatizados no próprio Postman com JavaScript",
+    "description": "**Descrição:**  \nColeção de testes para APIs REST usando Postman. O objetivo foi validar endpoints, autenticação, criação e consulta de recursos via métodos `GET`, `POST`, `PUT` e `DELETE`. Foram aplicados testes com variáveis de ambiente, scripts de pré-requisição e testes automáticos com asserções.\n\n**Tecnologias utilizadas:**\n\nPostman, JavaScript, JSON, REST API\n\n**Habilidades desenvolvidas:**\n\n- Criação de cenários completos de teste de API\n    \n- Validação de respostas HTTP, status codes e payloads\n    \n- Uso de testes automatizados no próprio Postman com JavaScript\n\n**Segurança:** use variáveis de ambiente do Postman e não publique tokens ou credenciais reais. IDs gerados são armazenados em variáveis durante a execução.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "42443849",
     "_collection_link": "https://go.postman.co/collection/42443849-98710b30-0f05-46f4-9ec4-b1f9cd610deb?source=collection_link"
@@ -17,15 +17,13 @@
             {
               "listen": "test",
               "script": {
-                "exec": [
-                  "let responseJson = (pm.response.json())\r",
-                  "\r",
-                  "let tokenSplit = responseJson['authorization'].split(' ')\r",
-                  "\r",
-                  "pm.globals.set(\"acessToken\", tokenSplit[1]);"
-                ],
                 "type": "text/javascript",
-                "packages": {}
+                "exec": [
+                  "const jsonData = pm.response.json();\r\n",
+                  "pm.test(\"Login realizado com sucesso\", function () { pm.response.to.have.status(200); });\r\n",
+                  "pm.test(\"Token de autenticação retornado\", function () { pm.expect(jsonData.authorization).to.exist; });\r\n",
+                  "pm.environment.set(\"accessToken\", jsonData.authorization.replace(\"Bearer \", \"\"));"
+                ]
               }
             }
           ],
@@ -37,7 +35,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n\"email\": \"armando@qa.com.br\",\r\n\"password\": \"Nimbus2000\"\r\n}",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -70,7 +68,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseURL}}/usuarios?_id=IS8eIb2BJKuHltsf",
+              "raw": "{{baseURL}}/usuarios?_id={{newUserId}}",
               "host": [
                 "{{baseURL}}"
               ],
@@ -80,7 +78,7 @@
               "query": [
                 {
                   "key": "_id",
-                  "value": "IS8eIb2BJKuHltsf"
+                  "value": "{{newUserId}}"
                 }
               ]
             }
@@ -113,28 +111,25 @@
             {
               "listen": "prerequest",
               "script": {
-                "exec": [
-                  "const randomNumber = Math.floor(Math.random() * 9000)\r",
-                  "const randomName = `User Number ${randomNumber}`\r",
-                  "const randomEmail = `name.${randomNumber}@qa.com`\r",
-                  "\r",
-                  "pm.globals.set('email', randomEmail)\r",
-                  "pm.globals.set('user', randomName)"
-                ],
                 "type": "text/javascript",
-                "packages": {}
+                "exec": [
+                  "const timestamp = Date.now();\r\n",
+                  "pm.environment.set(\"nome\", `Usuario QA ${timestamp}`);\r\n",
+                  "pm.environment.set(\"email\", `qa${timestamp}@example.com`);\r\n",
+                  "pm.environment.set(\"password\", \"SenhaQA123!\");"
+                ]
               }
             },
             {
               "listen": "test",
               "script": {
-                "exec": [
-                  "pm.test(\"Status code is 201\", function () {\r",
-                  "    pm.response.to.have.status(201);\r",
-                  "});"
-                ],
                 "type": "text/javascript",
-                "packages": {}
+                "exec": [
+                  "pm.test(\"Usuário cadastrado com sucesso\", function () { pm.response.to.have.status(201); });\r\n",
+                  "const responseJson = pm.response.json();\r\n",
+                  "pm.test(\"ID do usuário retornado\", function () { pm.expect(responseJson._id).to.exist; });\r\n",
+                  "if (pm.response.code === 201 && responseJson._id) pm.environment.set(\"newUserId\", responseJson._id);"
+                ]
               }
             }
           ],
@@ -146,7 +141,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"nome\": \"{{nome}}\",\r\n  \"email\": \"{{email}}\",\r\n  \"password\": \"Nimbus2000\",\r\n  \"administrador\": \"true\"\r\n}",
+              "raw": "{\n  \"nome\": \"{{nome}}\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\",\n  \"administrador\": true\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -175,7 +170,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"nome\": \"Armando Ferrari de Godoy\",\r\n  \"email\": \"armando@qa.com.br\",\r\n  \"password\": \"NovaNimbus2000\",\r\n  \"administrador\": \"true\"\r\n}",
+              "raw": "{\n  \"nome\": \"Usuario QA Editado\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\",\n  \"administrador\": true\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -183,20 +178,13 @@
               }
             },
             "url": {
-              "raw": "{{baseURL}}/usuarios/IS8eIb2BJKuHltsf",
+              "raw": "{{baseURL}}/usuarios/{{newUserId}}",
               "host": [
                 "{{baseURL}}"
               ],
               "path": [
                 "usuarios",
-                "IS8eIb2BJKuHltsf"
-              ],
-              "query": [
-                {
-                  "key": "_id",
-                  "value": "IS8eIb2BJKuHltsf",
-                  "disabled": true
-                }
+                "{{newUserId}}"
               ]
             }
           },
@@ -211,13 +199,13 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{baseURL}}/usuarios/DKZyu4hXoacxODbI",
+              "raw": "{{baseURL}}/usuarios/{{newUserId}}",
               "host": [
                 "{{baseURL}}"
               ],
               "path": [
                 "usuarios",
-                "DKZyu4hXoacxODbI"
+                "{{newUserId}}"
               ]
             }
           },
@@ -234,52 +222,20 @@
             {
               "listen": "prerequest",
               "script": {
-                "exec": [
-                  "const loginRequest = {\r",
-                  "    url: pm.environment.get('baseURL') + '/login',\r",
-                  "    method: 'POST',\r",
-                  "    body: {\r",
-                  "        mode: 'raw',\r",
-                  "        raw: JSON.stringify({\r",
-                  "            email: pm.globals.get('email'),\r",
-                  "            password: pm.globals.get('password')\r",
-                  "        }),\r",
-                  "        options: {\r",
-                  "            raw: {\r",
-                  "                language: 'json'\r",
-                  "            }\r",
-                  "        }\r",
-                  "    }\r",
-                  "}\r",
-                  "\r",
-                  "pm.sendRequest(loginRequest, function (err, response) {\r",
-                  "    let resJson = response.json()\r",
-                  "    let tokenSplit = resJson['authorization'].split(' ')\r",
-                  "    pm.environment.set('accessToken', tokenSplit[1])\r",
-                  "});\r",
-                  "\r",
-                  "pm.globals.set('randomProduct', `Product ${Math.random()}`)"
-                ],
                 "type": "text/javascript",
-                "packages": {}
+                "exec": [
+                  "pm.environment.set(\"randomProduct\", `QA Product ${Date.now()}`);"
+                ]
               }
             },
             {
               "listen": "test",
               "script": {
-                "exec": [
-                  "const responseJson = pm.response.json()\r",
-                  "\r",
-                  "pm.test(\"Status code is 201\", function () {\r",
-                  "    pm.response.to.have.status(201);\r",
-                  "});\r",
-                  "\r",
-                  "if(pm.response.code == 201) {\r",
-                  "    pm.globals.set('newProductI', responseJson._id)\r",
-                  "}"
-                ],
                 "type": "text/javascript",
-                "packages": {}
+                "exec": [
+                  "pm.test(\"Produto cadastrado com sucesso\", function () { pm.response.to.have.status(201); });\r\n",
+                  "if (pm.response.code === 201) { const responseJson = pm.response.json(); pm.environment.set(\"newProductId\", responseJson._id); pm.test(\"ID do produto retornado\", function () { pm.expect(responseJson._id).to.exist; }); }"
+                ]
               }
             }
           ],
@@ -289,7 +245,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "{{acessToken}}",
+                  "value": "{{accessToken}}",
                   "type": "string"
                 }
               ]
@@ -403,7 +359,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "{{acessToken}}",
+                  "value": "{{accessToken}}",
                   "type": "string"
                 }
               ]
@@ -440,7 +396,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "{{acessToken}}",
+                  "value": "{{accessToken}}",
                   "type": "string"
                 }
               ]
@@ -457,13 +413,13 @@
               }
             },
             "url": {
-              "raw": "{{baseURL}}/produtos/Yu5Z4r0hGbf7dxP9",
+              "raw": "{{baseURL}}/produtos/{{newProductId}}",
               "host": [
                 "{{baseURL}}"
               ],
               "path": [
                 "produtos",
-                "Yu5Z4r0hGbf7dxP9"
+                "{{newProductId}}"
               ]
             }
           },
@@ -502,7 +458,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "{{acessToken}}",
+                  "value": "{{accessToken}}",
                   "type": "string"
                 }
               ]
@@ -511,7 +467,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"produtos\": [\r\n    {\r\n      \"idProduto\": \"Yu5Z4r0hGbf7dxP9\",\r\n      \"quantidade\": 15\r\n    },\r\n    {\r\n      \"idProduto\": \"ke55NelGmJRSHPeX\",\r\n      \"quantidade\": 32\r\n    }\r\n  ]\r\n}",
+              "raw": "{\n  \"produtos\": [\n    {\n      \"idProduto\": \"{{newProductId}}\",\n      \"quantidade\": 1\n    }\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -528,7 +484,21 @@
               ]
             }
           },
-          "response": []
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const responseJson = pm.response.json();\r\n",
+                  "pm.test(\"Carrinho cadastrado com sucesso\", function () { pm.response.to.have.status(201); });\r\n",
+                  "pm.test(\"ID do carrinho retornado\", function () { pm.expect(responseJson._id).to.exist; });\r\n",
+                  "if (pm.response.code === 201 && responseJson._id) pm.environment.set(\"carrinhoId\", responseJson._id);"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "Buscar carrinho por ID",
@@ -539,17 +509,31 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseURL}}/carrinhos/148Cm53zvOAwUKmj",
+              "raw": "{{baseURL}}/carrinhos/{{carrinhoId}}",
               "host": [
                 "{{baseURL}}"
               ],
               "path": [
                 "carrinhos",
-                "148Cm53zvOAwUKmj"
+                "{{carrinhoId}}"
               ]
             }
           },
-          "response": []
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const responseJson = pm.response.json();\r\n",
+                  "pm.test(\"Consulta do carrinho retorna 200\", function () { pm.response.to.have.status(200); });\r\n",
+                  "pm.test(\"Carrinho possui produtos\", function () { pm.expect(responseJson.produtos).to.be.an(\"array\").that.is.not.empty; });\r\n",
+                  "pm.test(\"Total do carrinho está correto\", function () { const price = responseJson.produtos.reduce((sum,p)=>sum+p.quantidade*p.precoUnitario,0); const qty = responseJson.produtos.reduce((sum,p)=>sum+p.quantidade,0); pm.expect(responseJson.precoTotal).to.eql(price); pm.expect(responseJson.quantidadeTotal).to.eql(qty); });"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "Excluir carrinho",
@@ -559,7 +543,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "{{acessToken}}",
+                  "value": "{{accessToken}}",
                   "type": "string"
                 }
               ]
@@ -587,7 +571,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "{{acessToken}}",
+                  "value": "{{accessToken}}",
                   "type": "string"
                 }
               ]
