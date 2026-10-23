@@ -1,135 +1,66 @@
 # 🔌 Serverest API Testing | Postman
 
-<p align="center">
-  <strong>Projeto de portfólio para prática de testes de API REST com Postman e JavaScript.</strong>
-</p>
+Projeto de portfólio para praticar testes de API REST usando Postman, JavaScript e a API Serverest.
 
-<p align="center">
-  <img src="https://img.shields.io/badge/QA-API%20Testing-6A5ACD?style=for-the-badge" alt="QA API Testing">
-  <img src="https://img.shields.io/badge/Tool-Postman-FF6C37?style=for-the-badge&logo=postman&logoColor=white" alt="Postman">
-  <img src="https://img.shields.io/badge/Language-JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript">
-  <img src="https://img.shields.io/badge/API-REST-2563EB?style=for-the-badge" alt="REST API">
-</p>
+## Objetivo
 
-> **Objetivo:** demonstrar como estruturo e valido fluxos de API usando assertions, variáveis, autenticação, dados retornados entre requisições e verificações de regras de negócio. Este é um projeto de estudo e portfólio, não um sistema de produção.
+Demonstrar a criação e execução de requisições de API, validação de respostas HTTP, assertions, autenticação e reutilização de dados entre chamadas.
 
-## 📌 Visão geral
+## Cenários incluídos
 
-A coleção utiliza a [Serverest](https://serverest.dev/) como API de prática. Os testes verificam respostas HTTP, mensagens, campos de resposta e regras de negócio em fluxos de usuários, produtos e carrinhos.
+- **Login:** validação da resposta e armazenamento do token.
+- **Usuários:** cadastro com dados dinâmicos, consulta, edição e exclusão.
+- **Produtos:** cadastro, listagem, consulta, edição e exclusão.
+- **Carrinhos:** cadastro, consulta, validação de totais, conclusão de compra e cancelamento.
 
-### O que este projeto demonstra
+## Tecnologias
 
-- Validação de códigos HTTP e conteúdo da resposta.
-- Assertions com JavaScript na aba **Scripts → After response**.
-- Uso de variáveis de ambiente, incluindo `baseURL`, `accessToken`, `newProductId` e `carrinhoId`.
-- Autenticação por Bearer Token em rotas protegidas.
-- Reutilização de IDs retornados por requisições anteriores.
-- Validação de regras de negócio, como restrições de carrinho e produtos duplicados.
-- Cálculo dinâmico do preço total e da quantidade total do carrinho a partir dos produtos retornados.
+- Postman
+- JavaScript para scripts e assertions
+- HTTP, REST e JSON
+- Variáveis de ambiente
+- Git e GitHub
 
-## 🧪 Fluxos explorados
+## Como executar
 
-| Área | Requisições / comportamentos |
-|---|---|
-| Autenticação | Login e uso do token em requisições protegidas |
-| Usuários | Cadastro, consulta, listagem, edição e exclusão na coleção |
-| Produtos | Cadastro, consulta por ID, listagem, edição e exclusão na coleção |
-| Carrinhos | Cadastro, consulta por ID, conclusão de compra e cancelamento com retorno ao estoque |
+1. Importe `Postman/Serverest.postman_collection.json` no Postman.
+2. Crie e selecione um ambiente.
+3. Configure `baseURL` como `https://serverest.dev`.
+4. Execute **Cadastrar usuário** para gerar `nome`, `email`, `password` e `newUserId`.
+5. Execute **Realizar login** para gerar `accessToken`.
+6. Execute o cadastro de produto antes de consultas, edição ou carrinho para preencher `newProductId`.
+7. Execute o cadastro de carrinho antes da consulta para preencher `carrinhoId`.
+8. Confira os resultados na aba **Test Results**.
 
-> A tabela descreve os fluxos presentes na coleção. A cobertura de assertions e a execução automatizada são ampliadas de forma incremental; consulte os scripts e os resultados no Postman para verificar o estado mais recente de cada requisição.
-
-## 🔍 Exemplos de validação
-
-### Cadastro de carrinho
-
-O teste de cadastro verifica o status esperado, a mensagem da API e a presença do identificador. Quando a API confirma o cadastro com status `201`, o script salva o `_id` retornado na variável de ambiente `carrinhoId`.
-
-### Consulta do carrinho
-
-A consulta usa a URL dinâmica:
-
-```text
-{{baseURL}}/carrinhos/{{carrinhoId}}
-```
-
-Os testes verificam o status `200`, a presença de produtos, a consistência dos totais e a existência do ID retornado.
-
-O total é calculado a partir dos dados recebidos, em vez de depender de números fixos:
-
-```javascript
-const responseJson = pm.response.json();
-
-const precoTotalCalculado = responseJson.produtos.reduce(
-  (total, produto) => total + produto.quantidade * produto.precoUnitario,
-  0
-);
-
-const quantidadeTotalCalculada = responseJson.produtos.reduce(
-  (total, produto) => total + produto.quantidade,
-  0
-);
-
-pm.expect(responseJson.precoTotal).to.eql(precoTotalCalculado);
-pm.expect(responseJson.quantidadeTotal).to.eql(quantidadeTotalCalculada);
-```
-
-## 🧰 Tecnologias e conceitos
-
-- **Postman** — organização e execução das requisições.
-- **JavaScript** — scripts de validação e manipulação de respostas.
-- **HTTP / REST / JSON** — métodos, códigos de status e payloads.
-- **Variáveis de ambiente** — configuração reutilizável e encadeamento entre chamadas.
-- **Assertions** — validação de comportamento esperado e regras de negócio.
-- **Git / GitHub** — versionamento e documentação do projeto.
-
-## 🚀 Como explorar o projeto
-
-1. Acesse a [API Serverest](https://serverest.dev/) e leia a documentação das rotas.
-2. No Postman, importe a coleção exportada do workspace do projeto.
-3. Crie ou selecione um ambiente para a API.
-4. Configure a variável `baseURL` com `https://serverest.dev`.
-5. Não publique tokens, senhas ou valores sensíveis no repositório. Gere credenciais de teste próprias e mantenha-as no ambiente local do Postman.
-6. Execute primeiro os fluxos de preparação (cadastro/login, conforme necessário) e depois os fluxos que dependem dos IDs retornados.
-7. Abra **Test Results** após cada execução para revisar as assertions.
-
-### Variáveis utilizadas
+## Variáveis usadas
 
 | Variável | Finalidade |
 |---|---|
-| `baseURL` | URL base da API |
-| `email` | E-mail de teste usado no fluxo de autenticação |
-| `password` | Senha de teste mantida no ambiente local |
-| `accessToken` | Token de autenticação retornado pelo login |
-| `newProductId` | ID do produto criado/selecionado para o fluxo |
-| `carrinhoId` | ID do carrinho retornado pelo cadastro |
+| `baseURL` | Endereço base da API |
+| `nome`, `email`, `password` | Dados gerados no cadastro do usuário |
+| `newUserId` | ID retornado pelo cadastro do usuário |
+| `accessToken` | Token retornado pelo login |
+| `randomProduct` | Nome dinâmico do produto |
+| `newProductId` | ID retornado pelo cadastro do produto |
+| `carrinhoId` | ID retornado pelo cadastro do carrinho |
 
-Os valores devem ser preenchidos ou gerados durante a execução. **Não compartilhe um arquivo de ambiente com credenciais ou tokens reais.**
+## Observações
 
-## ⚠️ Comportamentos importantes da API de estudo
+- Execute as requisições na ordem adequada, pois algumas dependem de IDs e tokens gerados por requisições anteriores.
+- A API de estudo pode remover dados; cadastre novamente os recursos quando necessário.
+- Concluir ou cancelar uma compra altera o estado do carrinho.
+- Este é um projeto de estudo. Os testes precisam ser executados no Postman para confirmar os resultados; a publicação do código, por si só, não comprova que todos passaram.
 
-- Os dados da Serverest podem expirar ou ser removidos, então pode ser necessário cadastrar o usuário e os dados novamente antes de executar os fluxos.
-- A API permite apenas um carrinho ativo por usuário; criar outro carrinho sem concluir ou cancelar o atual pode retornar erro.
-- Um carrinho não pode conter o mesmo produto duplicado em entradas separadas.
-- Requisições de conclusão e cancelamento alteram o estado do carrinho. Execute-as somente quando houver um carrinho de teste ativo.
-- Uma resposta de erro pode ser um resultado esperado em um cenário negativo; avalie status, mensagem e regra de negócio em conjunto.
+## Próximas melhorias
 
-## 🗺️ Próximas melhorias
-
-- [ ] Versionar no repositório o arquivo exportado da coleção Postman, sem segredos.
-- [ ] Documentar cada cenário com pré-condições, passos e resultado esperado.
+- [ ] Executar e revisar todos os cenários no Postman.
 - [ ] Expandir cenários negativos e validações de contrato.
-- [ ] Tornar os dados de teste mais independentes e repetíveis.
-- [ ] Executar a coleção pela linha de comando usando Newman.
-- [ ] Integrar a execução ao GitHub Actions depois de validar o fluxo local.
-- [ ] Publicar evidências e relatórios reais das execuções.
+- [ ] Executar a coleção com Newman.
+- [ ] Integrar a execução validada ao GitHub Actions.
 
-## 👨‍💻 Autor
+## Autor
 
 **Lucas Estevam** — QA / Testes de Software e Automação
 
 - [GitHub](https://github.com/Estevam98)
 - [LinkedIn](https://www.linkedin.com/in/lucasestevam-qa/)
-
----
-
-*Projeto educacional em evolução contínua. As próximas etapas serão registradas à medida que forem implementadas e validadas.*
